@@ -697,6 +697,10 @@ define(['d3'], function() {
 
       newPointers = existingPointers.enter()
         .append('svg:line')
+        .filter(function(d) {
+          // Don't render root commit with a pointer
+          return d.parent !== 'initial';
+        })
         .attr('id', function(d) {
           return view.name + '-' + d.id + '-to-' + d.parent;
         })
