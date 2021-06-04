@@ -810,6 +810,43 @@ define(['d3'], function() {
         .remove()
     },
 
+    _replaceTag(old_tag, new_tag) {
+      var tagData = [],
+        i,
+        headCommit = null;
+
+      for (i = 0; i < this.commitData.length; i++) {
+        var c = this.commitData[i];
+
+        for (var t = 0; t < c.tags.length; t++) {
+          var tagName = c.tags[t];
+          if (tagName.toUpperCase() === 'HEAD') {
+            headCommit = c;
+          } else if (tagName === old_tag) {
+            c.tags[t] = new_tag;
+            tagName = c.tags[t];
+            this.branches.push(new_tag);
+          }
+
+          tagData.push({
+            name: tagName,
+            commit: c.id
+          });
+        }
+      }
+
+      if (!headCommit) {
+        headCommit = this.getCommit(this.currentBranch);
+        headCommit.tags.push('HEAD');
+        tagData.push({
+          name: 'HEAD',
+          commit: headCommit.id
+        });
+      }
+
+      return tagData;
+    },
+
     _parseTagData: function() {
       var tagData = [],
         i,
@@ -1259,6 +1296,26 @@ define(['d3'], function() {
         commit.tags.splice(branchIndex, 1);
       }
 
+      this.renderTags();
+    },
+
+    renameCheckedOutBranch: function(new_name) {
+      if (!new_name || new_name.trim() === '') {
+        throw new Error('You need to give a new branch name.');
+      }
+
+      if (this.branches.includes(new_name)) {
+        throw new Error('That branch already exists.');
+      }
+
+      let old_name = this.currentBranch;
+      this._replaceTag(old_name, new_name);
+      let branch_index = this.branches.indexOf(old_name);
+      this.branches[branch_index] = new_name;
+      this.logs[new_name] = this.logs[old_name];
+      delete this.logs[old_name];
+
+      this._setCurrentBranch(new_name);
       this.renderTags();
     },
 
