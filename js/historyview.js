@@ -1473,7 +1473,101 @@ define(['d3'], function() {
       }
     }, 'isAncestorOf'),
 
+    walkAncestors: function (commit_start, cb) {
+      let commits_set = new Set();
+      let commits = [commit_start];
+      let commit;
 
+      while (commit = commits.pop()) {
+        commits_set.add(commit);
+        if (commit.parent && commit.parent !== 'initial') {
+          let parent1_commit = this.getCommit(commit.parent);
+          // Bail early if cb's return is false
+          if (cb(parent1_commit) === false) return commits_set;
+          commits.push(parent1_commit);
+        }
+
+        if (commit.parent2 && commit.parent2 !== 'initial') {
+          let parent2_commit = this.getCommit(commit.parent2);
+          // Bail early if cb's return is false
+          if (cb(parent2_commit) === false) return commits_set;
+          commits.push(parent2_commit);
+        }
+      }
+
+      return commits_set;
+    },
+
+    // @see https://stackoverflow.com/a/27285628
+    mergeBase: function mergeBase(ref_a, ref_b) {
+      let commit_a = typeof ref_a === 'string' ? this.getCommit(ref_a) : ref_a;
+      let commit_b = typeof ref_b === 'string' ? this.getCommit(ref_b) : ref_b;
+
+      let ff_parent;
+
+      let a_to_root = this.walkAncestors(commit_a, (commit) => {
+        if (commit === commit_b) {
+          ff_parent = commit_b;
+        }
+        commit.color = "blue";
+      });
+      if (ff_parent) {
+        // Clean up colors
+        let all_commits = [...a_to_root];
+        for (let commit of all_commits) {
+          delete commit.color;
+        }
+        return ff_parent;
+      }
+  
+      let b_to_root = this.walkAncestors(
+        commit_b,
+        (commit) => {
+          if (commit === commit_a) {
+            ff_parent = commit_a;
+          }
+          if (commit.color === "blue") {
+            commit.color = "red";
+          }
+        }
+      );
+
+      if (ff_parent) {
+        // Clean up colors
+        let all_commits = [...new Set([...a_to_root, ...b_to_root])];
+        for (let commit of all_commits) {
+          delete commit.color;
+        }
+        return ff_parent;
+      }
+
+      this.walkAncestors(
+        commit_b,
+        (commit) => {
+          if (commit.color === 'red' && commit.parent) {
+            let parent = this.getCommit(commit.parent);
+
+            parent.color = 'black';
+          }
+        }
+      );
+
+      let base_commit;
+      this.walkAncestors(commit_a, function(commit) {
+        if (commit.color === 'red') {
+          base_commit = commit;
+          return false;
+        }
+      });
+
+      // Clean up colors
+      let all_commits = [...new Set([...a_to_root, ...b_to_root])];
+      for (let commit of all_commits) {
+        delete commit.color;
+      }
+
+      return base_commit;
+    },
 
     merge: logMiddleware(function(ref, noFF) {
       var mergeSource = this.getCommit(ref),
@@ -1483,8 +1577,6 @@ define(['d3'], function() {
         throw new Error('Cannot find ref: ' + ref);
       }
 
-      var mergeSourceParent = this.getCommit(mergeSource.parent);
-
       if (mergeTarget.id === mergeSource.id) {
         throw new Error('Already up-to-date.');
       } else if (mergeTarget.parent2 === mergeSource.id) {
@@ -1492,12 +1584,21 @@ define(['d3'], function() {
       } else if (this.isAncestorOf(mergeSource, mergeTarget)) {
         throw new Error('Already up-to-date.');
       } else if (noFF === true) {
-        var branchStartCommit = this.getCommit(mergeSource.parent);
-        while (branchStartCommit.parent !== mergeTarget.id) {
-          branchStartCommit = this.getCommit(branchStartCommit.parent);
+        let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
+        let merge_base_child_commit;
+        if (mergeSource.parent === merge_base_commit.id || mergeSource.parent2 === merge_base_commit.id) {
+          merge_base_child_commit = mergeSource;
+        } else {
+          this.walkAncestors(mergeSource, function(c) {
+            if (c.parent === merge_base_commit.id) {
+              merge_base_child_commit = c;
+              return false;
+            }
+          });
         }
 
-        branchStartCommit.isNoFFBranch = true;
+        // Mark this as the start of "non-ff branch" to render it on different y-plane
+        merge_base_child_commit.isNoFFBranch = true;
 
         this.commit({
           parent2: mergeSource.id,
