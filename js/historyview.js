@@ -24,7 +24,7 @@ define(['d3'], function() {
     px2, py2, fixPointerEndPosition,
     fixIdPosition, tagY, getUniqueSetItems;
 
-  preventOverlap = logMiddleware(function preventOverlap(commit, view) {
+  preventOverlap = function preventOverlap(commit, view) {
     var commitData = view.commitData,
       baseLine = view.baseLine,
       shift = view.commitRadius * 4.5,
@@ -52,9 +52,9 @@ define(['d3'], function() {
 
       preventOverlap(overlapped, view);
     }
-  });
+  };
 
-  applyBranchlessClass = logMiddleware(function(selection) {
+  applyBranchlessClass = function(selection) {
     if (selection.empty()) {
       return;
     }
@@ -72,9 +72,9 @@ define(['d3'], function() {
         return d.branchless ? FADED_MARKER_END : MERGE_MARKER_END;
       });
     }
-  }, 'applyBranchlessClass');
+  };
 
-  cx = logMiddleware(function(commit, view) {
+  cx = function(commit, view) {
     var parent = view.getCommit(commit.parent),
       parentCX = parent.cx;
 
@@ -85,9 +85,9 @@ define(['d3'], function() {
     }
 
     return parentCX + (view.commitRadius * 4.5);
-  }, 'cx');
+  };
 
-  cy = logMiddleware(function(commit, view) {
+  cy = function(commit, view) {
     var parent = view.getCommit(commit.parent),
       parentCY = parent.cy || cy(parent, view),
       baseLine = view.baseLine,
@@ -128,9 +128,9 @@ define(['d3'], function() {
     } else if (parentCY > baseLine) {
       return parentCY + (shift * branchIndex);
     }
-  }, 'cy');
+  };
 
-  fixCirclePosition = logMiddleware(function(selection) {
+  fixCirclePosition = function(selection) {
     selection
       .attr('cx', function(d) {
         return d.cx;
@@ -138,10 +138,10 @@ define(['d3'], function() {
       .attr('cy', function(d) {
         return d.cy;
       });
-  }, 'fixCirclePosition');
+  };
 
   // calculates the x1 point for commit pointer lines
-  px1 = logMiddleware(function(commit, view, pp) {
+  px1 = function(commit, view, pp) {
     pp = pp || 'parent';
 
     var parent = view.getCommit(commit[pp]),
@@ -151,10 +151,10 @@ define(['d3'], function() {
       length = Math.sqrt((diffX * diffX) + (diffY * diffY));
 
     return startCX - (view.pointerMargin * (diffX / length));
-  }, 'px1');
+  };
 
   // calculates the y1 point for commit pointer lines
-  py1 = logMiddleware(function(commit, view, pp) {
+  py1 = function(commit, view, pp) {
     pp = pp || 'parent';
 
     var parent = view.getCommit(commit[pp]),
@@ -164,17 +164,17 @@ define(['d3'], function() {
       length = Math.sqrt((diffX * diffX) + (diffY * diffY));
 
     return startCY + (view.pointerMargin * (diffY / length));
-  }, 'py1');
+  };
 
-  fixPointerStartPosition = logMiddleware(function(selection, view) {
+  fixPointerStartPosition = function(selection, view) {
     selection.attr('x1', function(d) {
       return px1(d, view);
     }).attr('y1', function(d) {
       return py1(d, view);
     });
-  }, 'fixPointerStartPosition');
+  };
 
-  px2 = logMiddleware(function(commit, view, pp) {
+  px2 = function(commit, view, pp) {
     pp = pp || 'parent';
 
     var parent = view.getCommit(commit[pp]),
@@ -184,9 +184,9 @@ define(['d3'], function() {
       length = Math.sqrt((diffX * diffX) + (diffY * diffY));
 
     return endCX + (view.pointerMargin * 1.2 * (diffX / length));
-  }, 'px2');
+  };
 
-  py2 = logMiddleware(function(commit, view, pp) {
+  py2 = function(commit, view, pp) {
     pp = pp || 'parent';
 
     var parent = view.getCommit(commit[pp]),
@@ -196,25 +196,25 @@ define(['d3'], function() {
       length = Math.sqrt((diffX * diffX) + (diffY * diffY));
 
     return endCY - (view.pointerMargin * 1.2 * (diffY / length));
-  }, 'py2');
+  };
 
-  fixPointerEndPosition = logMiddleware(function(selection, view) {
+  fixPointerEndPosition = function(selection, view) {
     selection.attr('x2', function(d) {
       return px2(d, view);
     }).attr('y2', function(d) {
       return py2(d, view);
     });
-  }, 'fixPointerEndPosition');
+  };
 
-  fixIdPosition = logMiddleware(function(selection, view, delta) {
+  fixIdPosition = function(selection, view, delta) {
     selection.attr('x', function(d) {
       return d.cx;
     }).attr('y', function(d) {
       return d.cy + view.commitRadius + delta;
     });
-  }, 'fixIdPosition');
+  };
 
-  tagY = logMiddleware(function tagY(t, view) {
+  tagY = function tagY(t, view) {
     var commit = view.getCommit(t.commit),
       commitCY = commit.cy,
       tags = commit.tags,
@@ -229,9 +229,9 @@ define(['d3'], function() {
     } else {
       return commitCY + 50 + (tagIndex * 25);
     }
-  }, 'tagY');
+  };
 
-  getUniqueSetItems = logMiddleware(function(set1, set2) {
+  getUniqueSetItems = function(set1, set2) {
     var uniqueSet1 = JSON.parse(JSON.stringify(set1))
     var uniqueSet2 = JSON.parse(JSON.stringify(set2))
     for (var id in set1) {
@@ -241,7 +241,7 @@ define(['d3'], function() {
       delete uniqueSet1[id]
     }
     return [uniqueSet1, uniqueSet2]
-  }, 'getUniqueSetItems');
+  };
 
   /**
    * @class HistoryView
@@ -304,7 +304,7 @@ define(['d3'], function() {
   };
 
   HistoryView.prototype = {
-    serialize: logMiddleware(function () {
+    serialize: function () {
       var data = {
         commitData: this.commitData,
         branches: this.branches,
@@ -313,9 +313,9 @@ define(['d3'], function() {
       }
 
       return JSON.stringify(data)
-    }, 'serialize'),
+    },
 
-    deserialize: logMiddleware(function (data) {
+    deserialize: function (data) {
       data = JSON.parse(data)
       if (data) {
         this.commitData = data.commitData
@@ -325,9 +325,9 @@ define(['d3'], function() {
         this.renderCommits()
         this.renderTags()
       }
-    }, 'deserialize'),
+    },
 
-    emit: logMiddleware(function (event) {
+    emit: function (event) {
       var callbacks = this._eventCallbacks[event] || []
       callbacks.forEach(function(callback) {
         try {
@@ -336,9 +336,9 @@ define(['d3'], function() {
           // nothing
         }
       })
-    }, 'emit'),
+    },
 
-    on: logMiddleware(function (event, callback) {
+    on: function (event, callback) {
       var callbacks = this._eventCallbacks[event] || []
       callbacks.push(callback)
       this._eventCallbacks[event] = callbacks
@@ -351,16 +351,16 @@ define(['d3'], function() {
           this._eventCallbacks[event] = cbs
         }
       }.bind(this)
-    }, 'on'),
+    },
 
-    lock: logMiddleware(function () {
+    lock: function () {
       this.locks++
       if (this.locks === 1) {
         this.emit('lock')
       }
-    }, 'lock'),
+    },
 
-    unlock: logMiddleware(function () {
+    unlock: function () {
       if (this.locks <= 0) {
         throw new Error('cannot unlock! not locked')
       }
@@ -369,14 +369,14 @@ define(['d3'], function() {
       if (this.locks === 0) {
         this.emit('unlock')
       }
-    }, 'unlock'),
+    },
 
     /**
      * @method getCommit
      * @param ref {String} the id or a tag name that refers to the commit
      * @return {Object} the commit datum object
      */
-    getCommit: logMiddleware(function getCommit(ref) {
+    getCommit: function getCommit(ref) {
       // Optimization, doesn't seem to break anything
       if (!ref) return null;
       if (ref.id) return ref
@@ -484,23 +484,23 @@ define(['d3'], function() {
       }
 
       return matchedCommit;
-    }, 'getCommit'),
+    },
 
-    revparse: logMiddleware(function(refspec) {
+    revparse: function(refspec) {
       var commit
       if (commit = this.getCommit(refspec)) {
         return commit.id
       } else {
         throw new Error("Cannot find object from refspec " + refspec)
       }
-    }, 'revparse'),
+    },
 
     /**
      * @method getCircle
      * @param ref {String} the id or a tag name that refers to the commit
      * @return {d3 Selection} the d3 selected SVG circle
      */
-    getCircle: logMiddleware(function(ref) {
+    getCircle: function(ref) {
       var circle = this.svg.select('#' + this.name + '-' + ref),
         commit;
 
@@ -515,17 +515,17 @@ define(['d3'], function() {
       }
 
       return this.svg.select('#' + this.name + '-' + commit.id);
-    }, 'getCircle'),
+    },
 
-    getCircles: logMiddleware(function() {
+    getCircles: function() {
       return this.svg.selectAll('circle.commit');
-    }, 'getCircles'),
+    },
 
     /**
      * @method render
      * @param container {String} selector for the container to render the SVG into
      */
-    render: logMiddleware(function(container) {
+    render: function(container) {
       var svgContainer, svg;
 
       svgContainer = container.append('div')
@@ -570,9 +570,9 @@ define(['d3'], function() {
       this.renderCommits();
 
       this._setCurrentBranch(this.currentBranch);
-    }, 'render'),
+    },
 
-    destroy: logMiddleware(function() {
+    destroy: function() {
       this.svg.remove();
       this.svgContainer.remove();
       clearInterval(this.refreshSizeTimer);
@@ -582,18 +582,18 @@ define(['d3'], function() {
           this[prop] = null;
         }
       }
-    }, 'destroy'),
+    },
 
-    _calculatePositionData: logMiddleware(function() {
+    _calculatePositionData: function() {
       for (var i = 0; i < this.commitData.length; i++) {
         var commit = this.commitData[i];
         commit.cx = cx(commit, this);
         commit.cy = cy(commit, this);
         preventOverlap(commit, this);
       }
-    }, '_calculatePositionData'),
+    },
 
-    _resizeSvg: logMiddleware(function() {
+    _resizeSvg: function() {
       var ele = document.getElementById(this.svg.node().id);
       var container = ele.parentNode;
       var currentWidth = ele.offsetWidth;
@@ -608,9 +608,9 @@ define(['d3'], function() {
         this.svg.attr('width', newWidth);
         container.scrollLeft = container.scrollWidth;
       }
-    }, '_resizeSvg'),
+    },
 
-    renderCommits: logMiddleware(function() {
+    renderCommits: function() {
       if (typeof this.height === 'string' && this.height.indexOf('%') >= 0) {
         var perc = this.height.substring(0, this.height.length - 1) / 100.0;
         var baseLineCalcHeight = Math.round(this.svg.node().parentNode.offsetHeight * perc) - 65;
@@ -629,9 +629,9 @@ define(['d3'], function() {
       this._renderIdLabels();
       this._resizeSvg();
       this.currentBranch && this.checkout(this.currentBranch);
-    }, 'renderCommits'),
+    },
 
-    _renderCircles: logMiddleware(function() {
+    _renderCircles: function() {
       var view = this,
         existingCircles,
         newCircles;
@@ -687,9 +687,9 @@ define(['d3'], function() {
       existingCircles.exit()
         .remove()
 
-    }, '_renderCircles'),
+    },
 
-    _renderPointers: logMiddleware(function() {
+    _renderPointers: function() {
       var view = this,
         existingPointers,
         newPointers;
@@ -731,9 +731,9 @@ define(['d3'], function() {
 
       existingPointers.exit()
         .remove()
-    }, '_renderPointers'),
+    },
 
-    _renderMergePointers: logMiddleware(function() {
+    _renderMergePointers: function() {
       var view = this,
         mergeCommits = [],
         existingPointers, newPointers;
@@ -788,18 +788,18 @@ define(['d3'], function() {
 
       existingPointers.exit()
         .remove()
-    }, '_renderMergePointers'),
+    },
 
-    _renderIdLabels: logMiddleware(function() {
+    _renderIdLabels: function() {
       this._renderText('id-label', function(d) {
         return d.id + '..';
       }, 14);
       this._renderText('message-label', function(d) {
         return d.message;
       }, 24);
-    }, '_renderIdLabels'),
+    },
 
-    _renderText: logMiddleware(function(className, getText, delta) {
+    _renderText: function(className, getText, delta) {
       var view = this,
         existingTexts,
         newtexts;
@@ -820,9 +820,9 @@ define(['d3'], function() {
 
       existingTexts.exit()
         .remove()
-    }, '_renderText'),
+    },
 
-    _replaceTag: logMiddleware(function (old_tag, new_tag) {
+    _replaceTag: function (old_tag, new_tag) {
       var tagData = [],
         i,
         headCommit = null;
@@ -857,9 +857,9 @@ define(['d3'], function() {
       }
 
       return tagData;
-    }, '_replaceTag'),
+    },
 
-    _parseTagData: logMiddleware(function() {
+    _parseTagData: function() {
       var tagData = [],
         i,
         headCommit = null;
@@ -895,15 +895,15 @@ define(['d3'], function() {
 
 
       return tagData;
-    }, '_parseTagData'),
+    },
 
-    _walkCommit: logMiddleware(function (commit) {
+    _walkCommit: function (commit) {
       commit.branchless = false
       commit.parent && this._walkCommit(this.getCommit(commit.parent))
       commit.parent2 && this._walkCommit(this.getCommit(commit.parent2))
-    }, '_walkCommit'),
+    },
 
-    _markBranchlessCommits: logMiddleware(function() {
+    _markBranchlessCommits: function() {
       var branch, commit, parent, parent2, c, b;
 
       // first mark every commit as branchless
@@ -925,9 +925,9 @@ define(['d3'], function() {
       this.svg.selectAll('circle.commit').call(applyBranchlessClass);
       this.svg.selectAll('line.commit-pointer').call(applyBranchlessClass);
       this.svg.selectAll('polyline.merge-pointer').call(applyBranchlessClass);
-    }, '_markBranchlessCommits'),
+    },
 
-    renderTags: logMiddleware(function() {
+    renderTags: function() {
       var view = this,
         tagData = this._parseTagData(),
         existingTags, newTags;
@@ -1010,9 +1010,9 @@ define(['d3'], function() {
         .remove()
 
       this._markBranchlessCommits();
-    }, 'renderTags'),
+    },
 
-    _setCurrentBranch: logMiddleware(function(branch) {
+    _setCurrentBranch: function(branch) {
       var display = this.svg.select('text.current-branch-display'),
         text = 'HEAD: ';
 
@@ -1025,18 +1025,18 @@ define(['d3'], function() {
       }
 
       display.text(text);
-    }, '_setCurrentBranch'),
+    },
 
-    addReflogEntry: logMiddleware(function(ref, destination, reason) {
+    addReflogEntry: function(ref, destination, reason) {
       ref = ref.toLowerCase()
       this.logs[ref] = this.logs[ref] || []
       this.logs[ref].unshift({
         destination: destination,
         reason: reason
       })
-    }, 'addReflogEntry'),
+    },
 
-    getReflogEntries: logMiddleware(function(ref) {
+    getReflogEntries: function(ref) {
       if (!this.logs[ref.toLowerCase()]) {
         throw new Error("no reflog for " + ref)
       }
@@ -1044,9 +1044,9 @@ define(['d3'], function() {
       return this.logs[ref.toLowerCase()].map(function(entry, idx) {
         return entry.destination + " " + ref + "@{" + idx + "} " + " " + entry.reason
       })
-    }, 'getReflogEntries'),
+    },
 
-    moveTag: logMiddleware(function(tag, ref) {
+    moveTag: function(tag, ref) {
       var currentLoc = this.getCommit(tag),
         newLoc = this.getCommit(ref);
 
@@ -1056,13 +1056,13 @@ define(['d3'], function() {
 
       newLoc.tags.push(tag);
       return this;
-    }, 'moveTag'),
+    },
 
-    amendCommit: logMiddleware(function(message) {
+    amendCommit: function(message) {
       this.commit({parent: this.getCommit('head^').id}, message)
-    }, 'amendCommit'),
+    },
 
-    commit: logMiddleware(function(commit, message) {
+    commit: function(commit, message) {
       commit = commit || {};
 
       !commit.id && (commit.id = HistoryView.generateId());
@@ -1086,9 +1086,9 @@ define(['d3'], function() {
         this.checkout(commit.id)
       }
       return this;
-    }, 'commit'),
+    },
 
-    getLogEntries: logMiddleware(function(refspec) {
+    getLogEntries: function(refspec) {
       var ancestors = this.getAncestorSet(refspec)
       delete ancestors.initial
       ancestors[refspec] = -1
@@ -1103,22 +1103,22 @@ define(['d3'], function() {
           var commit = commitInfo.commit
           return commit.id + ' ' + (commit.message || "(no message)")
         }, this)
-    }, 'getLogEntries'),
+    },
 
-    setProperty: logMiddleware(function(refs, property) {
+    setProperty: function(refs, property) {
       refs.forEach(function(ref) {
         this.getCommit(ref)[property] = true
       }, this)
-    }, 'setProperty'),
+    },
 
-    unsetProperty: logMiddleware(function(refs, property) {
+    unsetProperty: function(refs, property) {
       refs.forEach(function(ref) {
         var commit = this.getCommit(ref)
         delete commit[property]
       }, this)
-    }, 'unsetProperty'),
+    },
 
-    cherryPick: logMiddleware(function(refs, mainline) {
+    cherryPick: function(refs, mainline) {
       refs.forEach(function(ref) {
         if (!this.getCommit(ref)) {
           throw new Error("fatal: bad revision '" + ref + "'")
@@ -1189,9 +1189,9 @@ define(['d3'], function() {
           }, this.unlock)
         }, this)
       }
-    }, 'cherryPick'),
+    },
 
-    getNonMainlineCommits: logMiddleware(function(ref, mainline) {
+    getNonMainlineCommits: function(ref, mainline) {
       if (mainline === 1) mainline = 2
       else if (mainline === 2) mainline = 1
       else throw new Error("Mainline " + mainline + " isn't supported")
@@ -1199,9 +1199,9 @@ define(['d3'], function() {
       var ancestor2Set = this.getAncestorSet(ref, 2)
       var uniqueAncestors = getUniqueSetItems(ancestor1Set, ancestor2Set)
       return Object.keys(uniqueAncestors[mainline-1]).concat(ref)
-    }, 'getNonMainlineCommits'),
+    },
 
-    flashProperty: logMiddleware(function(refs, property, callback, callback2) {
+    flashProperty: function(refs, property, callback, callback2) {
       this.setProperty(refs, property)
       this.renderCommits()
       setTimeout(function() {
@@ -1212,9 +1212,9 @@ define(['d3'], function() {
           callback2 && callback2.call(this)
         }.bind(this), 500)
       }.bind(this), 1000)
-    }, 'flashProperty'),
+    },
 
-    getParents: logMiddleware(function(ref, mainline) {
+    getParents: function(ref, mainline) {
       var commit,
         parents = []
       if (ref.id) {
@@ -1225,9 +1225,9 @@ define(['d3'], function() {
       if ((!mainline || mainline === 1) && commit.parent) parents.push(commit.parent)
       if ((!mainline || mainline === 2) && commit.parent2) parents.push(commit.parent2)
       return parents
-    }, 'getParents'),
+    },
 
-    getAncestorSet: logMiddleware(function(ref, mainline) {
+    getAncestorSet: function(ref, mainline) {
       var ancestors = {}
       var i = 1;
       function getAncestor(currentRef, currentMainline) {
@@ -1239,9 +1239,9 @@ define(['d3'], function() {
       }
       getAncestor.call(this, ref, mainline)
       return ancestors
-    }, 'getAncestorSet'),
+    },
 
-    getBranchList: logMiddleware(function() {
+    getBranchList: function() {
       return this.commitData.reduce(function(acc, commit) {
         return acc.concat(commit.tags.filter(function(tag) {
           return !tag.match(/^\[.*\]$/) && tag !== 'HEAD'
@@ -1253,9 +1253,9 @@ define(['d3'], function() {
           return '&nbsp; ' + tag
         }
       }, this)
-    }, 'getBranchList'),
+    },
 
-    branch: logMiddleware(function(name, startCommit) {
+    branch: function(name, startCommit) {
       if (!name || name.trim() === '') {
         throw new Error('You need to give a branch name.');
       }
@@ -1275,13 +1275,13 @@ define(['d3'], function() {
       startPoint.tags.push(name);
       this.renderTags();
       return this;
-    }, 'branch'),
+    },
 
-    tag: logMiddleware(function(name) {
+    tag: function(name) {
       this.branch('[' + name + ']');
-    }, 'tag'),
+    },
 
-    deleteBranch: logMiddleware(function(name) {
+    deleteBranch: function(name) {
       var branchIndex,
         commit;
 
@@ -1309,9 +1309,9 @@ define(['d3'], function() {
       }
 
       this.renderTags();
-    }, 'deleteBranch'),
+    },
 
-    renameCheckedOutBranch: logMiddleware(function(new_name) {
+    renameCheckedOutBranch: function(new_name) {
       if (!new_name || new_name.trim() === '') {
         throw new Error('You need to give a new branch name.');
       }
@@ -1329,9 +1329,9 @@ define(['d3'], function() {
 
       this._setCurrentBranch(new_name);
       this.renderTags();
-    }, 'renameCheckedOutBranch'),
+    },
 
-    checkout: logMiddleware(function(ref) {
+    checkout: function(ref) {
       var commit = this.getCommit(ref);
 
       if (!commit) {
@@ -1353,9 +1353,9 @@ define(['d3'], function() {
       newHead.classed('checked-out', true);
 
       return this;
-    }, 'checkout'),
+    },
 
-    reset: logMiddleware(function(ref) {
+    reset: function(ref) {
       var commit = this.getCommit(ref);
 
       if (!commit) {
@@ -1370,9 +1370,9 @@ define(['d3'], function() {
       }
 
       return this;
-    }, 'reset'),
+    },
 
-    revert: logMiddleware(function(refs, mainline) {
+    revert: function(refs, mainline) {
       refs.forEach(function(ref) {
         if (!this.getCommit(ref)) {
           throw new Error("fatal: bad revision '" + ref + "'")
@@ -1443,9 +1443,9 @@ define(['d3'], function() {
           }, this.unlock)
         }, this)
       }
-    }, 'revert'),
+    },
 
-    fastForward: logMiddleware(function(ref) {
+    fastForward: function(ref) {
       var targetCommit = this.getCommit(ref);
 
       if (this.currentBranch) {
@@ -1454,9 +1454,9 @@ define(['d3'], function() {
       } else {
         this.checkout(targetCommit.id);
       }
-    }, 'fastForward'),
+    },
 
-    isAncestorOf: logMiddleware(function(search, start) {
+    isAncestorOf: function(search, start) {
       var startCommit = this.getCommit(start),
         searchCommit = this.getCommit(search)
 
@@ -1471,7 +1471,7 @@ define(['d3'], function() {
         var ancestorOnSecondParent = startCommit.parent2 && this.isAncestorOf(searchCommit.id, startCommit.parent2)
         return ancestorOnFirstParent || ancestorOnSecondParent
       }
-    }, 'isAncestorOf'),
+    },
 
     walkAncestors: function (commit_start, cb) {
       let commits_set = new Set();
@@ -1569,7 +1569,7 @@ define(['d3'], function() {
       return base_commit;
     },
 
-    merge: logMiddleware(function(ref, noFF) {
+    merge: function(ref, noFF) {
       var mergeSource = this.getCommit(ref),
         mergeTarget = this.getCommit('HEAD');
       
@@ -1612,9 +1612,9 @@ define(['d3'], function() {
           parent2: mergeSource.id
         }, 'Merge');
       }
-    }, 'merge'),
+    },
 
-    rebase: logMiddleware(function(ref) {
+    rebase: function(ref) {
       var targetCommit = this.getCommit(ref)
       if (!targetCommit) {
         throw new Error("Cannot find commit " + ref) // TODO: better message
@@ -1669,7 +1669,7 @@ define(['d3'], function() {
           }.bind(this), 1000)
         }, this.unlock)
       }.bind(this), 1000)
-    }, 'rebase'),
+    },
   };
 
   return HistoryView;
