@@ -608,14 +608,18 @@ function(_yargs, d3, demos) {
       var branch = args[0];
       var result
       if (args.length === 2) {
-        if (args[0] === '--no-ff') {
-          noFF = true;
+        if (args[0] === '--no-ff' || args[0] === '--ff') {
+          if (args[0] === '--no-ff') {
+            noFF = true;
+          }
           branch = args[1];
-        } else if (args[1] === '--no-ff') {
-          noFF = true;
+        } else if (args[1] === '--no-ff' || args[1] === '--ff') {
+          if (args[1] === '--no-ff') {
+            noFF = true;
+          }
           branch = args[0];
         } else {
-          this.info('This demo only supports the --no-ff switch..');
+          this.info('This demo only supports the --no-ff and --ff switches..');
         }
       }
 
