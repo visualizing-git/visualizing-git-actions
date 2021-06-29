@@ -833,7 +833,7 @@ function(_yargs, d3, demos) {
       }
 
       if (remote.branches.indexOf(remoteRef) === -1) {
-        remote.branch(remoteRef, 'e137e9b')
+        remote.branch(remoteRef, 'abc1234')
       }
 
       if (branchArgs) {

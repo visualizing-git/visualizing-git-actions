@@ -2,8 +2,8 @@ define([], function () {
   var free = {
     title: "Free Explore",
     key: "free",
-    message: "Have fun!",
-    commitData: [{ id: "e137e9b", tags: ["main"], message: "first commit" }],
+    message: "Test out 'commit', 'branch', and 'checkout'",
+    commitData: [{ id: "abc1234", tags: ["main"], message: "first commit" }],
   };
 
   var freeWithRemote = {
@@ -11,9 +11,74 @@ define([], function () {
     key: "free-remote",
     message: "Have fun!",
     commitData: [
-      { id: "e137e9b", tags: ["main", "origin/main"], message: "first commit" },
+      { id: "abc1234", tags: ["main", "origin/main"], message: "first commit" },
     ],
-    originData: [{ id: "e137e9b", tags: ["main"], message: "first commit" }],
+    originData: [{ id: "abc1234", tags: ["main"], message: "first commit" }],
+  };
+
+  var mergeExample = {
+    title: "Merge Example",
+    key: "merge-example",
+    commitData: [
+      {
+        id: "abc1234",
+        tags: [],
+        message: "first commit",
+        parent: "initial",
+        cx: 50,
+        cy: 369,
+        branchless: false,
+      },
+      {
+        id: "818b21c",
+        tags: ["main", "HEAD"],
+        parent: "abc1234",
+        cx: 140,
+        cy: 369,
+        branchless: false,
+      },
+      {
+        id: "5fb6bcc",
+        tags: [],
+        parent: "818b21c",
+        cx: 230,
+        cy: 369,
+        branchless: false,
+      },
+      {
+        id: "dcfc607",
+        tags: ["feature-1"],
+        parent: "5fb6bcc",
+        cx: 320,
+        cy: 369,
+        branchless: false,
+      },
+      {
+        id: "15ec1bd",
+        tags: [],
+        parent: "abc1234",
+        cx: 140,
+        cy: 279,
+        branchless: false,
+      },
+      {
+        id: "0f2baaf",
+        tags: [],
+        parent: "15ec1bd",
+        cx: 230,
+        cy: 279,
+        branchless: false,
+      },
+      {
+        id: "b1ecc95",
+        tags: ["feature-2"],
+        parent: "0f2baaf",
+        cx: 320,
+        cy: 279,
+        branchless: false,
+      },
+    ],
+    currentBranch: "main",
   };
 
   var upstreamChanges = {
@@ -23,37 +88,37 @@ define([], function () {
     currentBranch: "feature",
     commitData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
       },
       {
         id: "84c98fe",
-        parent: "e137e9b",
+        parent: "abc1234",
         tags: ["main", "origin/main"],
       },
       {
         id: "1c016b6",
-        parent: "e137e9b",
+        parent: "abc1234",
         tags: ["feature", "origin/feature", "HEAD"],
       },
     ],
     originData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
       },
       {
         id: "84c98fe",
-        parent: "e137e9b",
+        parent: "abc1234",
         tags: ["main", "HEAD"],
       },
       {
         id: "1c016b6",
-        parent: "e137e9b",
+        parent: "abc1234",
         tags: [],
       },
       {
@@ -71,50 +136,42 @@ define([], function () {
     currentBranch: "feature",
     commitData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
         cx: 50,
-        cy: 330,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "84c98fe",
-        parent: "e137e9b",
+        id: "267c628",
         tags: ["main", "origin/main"],
+        parent: "abc1234",
         cx: 140,
-        cy: 330,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "1c016b6",
-        parent: "e137e9b",
+        id: "94b5af7",
         tags: [],
+        parent: "abc1234",
         cx: 140,
-        cy: 240,
+        cy: 347,
         branchless: false,
       },
       {
-        id: "fd0af32",
-        parent: "1c016b6",
-        tags: [],
-        cx: 230,
-        cy: 240,
-        branchless: false,
-      },
-      {
-        id: "5041e4c",
+        id: "4aca73f",
         tags: ["feature", "origin/feature", "HEAD"],
-        parent: "fd0af32",
-        cx: 320,
-        cy: 240,
+        parent: "94b5af7",
+        cx: 230,
+        cy: 347,
         branchless: false,
       },
     ],
     originData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
@@ -123,36 +180,37 @@ define([], function () {
         branchless: false,
       },
       {
-        id: "84c98fe",
-        parent: "e137e9b",
+        id: "267c628",
         tags: ["main"],
+        parent: "abc1234",
         cx: 140,
         cy: 360,
         branchless: false,
       },
       {
-        id: "1c016b6",
-        parent: "e137e9b",
+        id: "4aca73f",
         tags: [],
+        parent: "94b5af7",
+        cx: 230,
+        cy: 270,
+        branchless: true,
+      },
+      {
+        id: "94b5af7",
+        tags: [],
+        parent: "abc1234",
         cx: 140,
         cy: 270,
         branchless: false,
       },
       {
-        id: "fd0af32",
+        id: "0c5bda6",
         tags: ["feature", "HEAD"],
-        parent: "1c016b6",
+        message: "force push",
+        parent: "94b5af7",
         cx: 230,
-        cy: 270,
+        cy: 180,
         branchless: false,
-      },
-      {
-        id: "5041e4c",
-        tags: [],
-        parent: "fd0af32",
-        cx: 320,
-        cy: 270,
-        branchless: true,
       },
     ],
   };
@@ -163,7 +221,7 @@ define([], function () {
     message: "Oops, let's revert some commits",
     commitData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
@@ -174,7 +232,7 @@ define([], function () {
       {
         id: "dd70cfe",
         tags: [],
-        parent: "e137e9b",
+        parent: "abc1234",
         cx: 140,
         cy: 330,
         branchless: false,
@@ -222,7 +280,7 @@ define([], function () {
     message: "Let's pick some commits",
     commitData: [
       {
-        id: "e137e9b",
+        id: "abc1234",
         tags: [],
         message: "first commit",
         parent: "initial",
@@ -233,7 +291,7 @@ define([], function () {
       {
         id: "790dd94",
         tags: [],
-        parent: "e137e9b",
+        parent: "abc1234",
         cx: 140,
         cy: 318,
         branchless: false,
@@ -318,6 +376,7 @@ define([], function () {
   return [
     free,
     freeWithRemote,
+    mergeExample,
     upstreamChanges,
     rewrittenHistory,
     revert,
