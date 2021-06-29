@@ -13,6 +13,15 @@ function(_yargs, d3, demos) {
     return result
   }
 
+  function slugify(text) {
+    return String(text).toLowerCase()
+      .replace(/\s+/g, '-')           // Replace spaces with -
+      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+      .replace(/^-+/, '')             // Trim - from start of text
+      .replace(/-+$/, '');            // Trim - from end of text
+  }
+
   /**
    * @class ControlBox
    * @constructor
@@ -301,6 +310,29 @@ function(_yargs, d3, demos) {
       if (entry === 'clear') {
         window.resetVis()
         return
+      }
+
+      if (entry.startsWith("export ")) {
+        let [, title, message] = yargs(entry)._;
+        if (!title) {
+          throw new Error('Usage: `export <title> [message]`');
+        }
+
+        let demo = {
+          title,
+          key: slugify(title),
+          commitData: this.historyView.commitData,
+          currentBranch: this.historyView.currentBranch,
+        };
+        if (this.originView) {
+          demo.originData = this.originView.commitData;
+        }
+        if (message) {
+          demo.message = message;
+        }
+
+        console.log(JSON.stringify(demo));
+        return this.info('Exported JSON to terminal. Copying this to `demos.js`.');
       }
 
       var split = entry.split(' ');
