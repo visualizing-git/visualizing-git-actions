@@ -258,10 +258,8 @@ function(_yargs, d3, demos) {
         return
       }
 
-      if (entry.indexOf('mode ') === 0) {
-        var mode = entry.split(' ').pop()
-        this.changeMode(mode)
-        return
+      if (entry === 'local' || entry === 'remote') {
+        return this.changeMode(entry);
       }
 
       if (entry === 'undo') {
@@ -304,8 +302,6 @@ function(_yargs, d3, demos) {
         window.resetVis()
         return
       }
-
-
 
       var split = entry.split(' ');
 

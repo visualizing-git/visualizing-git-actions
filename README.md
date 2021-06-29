@@ -28,7 +28,8 @@ App-specific operations:
 pres() # Turn on presenter mode
 undo   # Undo the last git command
 redo   # Redo the last undone git command
-mode   # Change mode (local or remote)
+local  # Change mode to local
+remote # Change mode to remote
 clear  # Clear the history pane and reset the visualization
 ```
 
