@@ -220,14 +220,14 @@ function(_yargs, d3, demos) {
     },
 
     command: function(entry) {
-      entry = entry.trim()
+      entry = String(entry).trim().toLowerCase();
       if (entry === '') {
         return;
       }
 
       document.getElementById('last-command').textContent = entry
 
-      if (entry.trim() === 'help' || entry.trim() === 'help()') {
+      if (entry === 'help' || entry === 'help()') {
         this.info('pres() = Turn on presenter mode')
         this.info('undo = Undo the last git command')
         this.info('redo = Redo the last undone git command')
@@ -237,7 +237,7 @@ function(_yargs, d3, demos) {
         this.info('Available Git Commands:')
         this.info('`git branch`')
         this.info('`git checkout`')
-        this.info('`git cherry_pick`')
+        this.info('`git cherry-pick`')
         this.info('`git commit`')
         this.info('`git fetch`')
         this.info('`git log`')
@@ -247,7 +247,7 @@ function(_yargs, d3, demos) {
         this.info('`git rebase`')
         this.info('`git reflog`')
         this.info('`git reset`')
-        this.info('`git rev_parse`')
+        this.info('`git rev-parse`')
         this.info('`git revert`')
         this.info('`git tag`')
         return
@@ -258,13 +258,13 @@ function(_yargs, d3, demos) {
         return
       }
 
-      if (entry.toLowerCase().indexOf('mode ') === 0) {
+      if (entry.indexOf('mode ') === 0) {
         var mode = entry.split(' ').pop()
         this.changeMode(mode)
         return
       }
 
-      if (entry.toLowerCase() === 'undo') {
+      if (entry === 'undo') {
         var lastId = this.undoHistory.pointer - 1
         var lastState = this.undoHistory.stack[lastId]
         if (lastState) {
@@ -282,7 +282,7 @@ function(_yargs, d3, demos) {
         return
       }
 
-      if (entry.toLowerCase() === 'redo') {
+      if (entry === 'redo') {
         var lastId = this.undoHistory.pointer + 1
         var lastState = this.undoHistory.stack[lastId]
         if (lastState) {
@@ -300,10 +300,12 @@ function(_yargs, d3, demos) {
         return
       }
 
-      if (entry.toLowerCase() === 'clear') {
+      if (entry === 'clear') {
         window.resetVis()
         return
       }
+
+
 
       var split = entry.split(' ');
 
