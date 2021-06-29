@@ -240,8 +240,10 @@ function(_yargs, d3, demos) {
         this.info('pres() = Turn on presenter mode')
         this.info('undo = Undo the last git command')
         this.info('redo = Redo the last undone git command')
-        this.info('mode = Change mode (`local` or `remote`)')
+        this.info('local = Change mode to local')
+        this.info('remote = Change mode to remote')
         this.info('clear = Clear the history pane and reset the visualization')
+        this.info('export = Output git JSON data')
         this.info()
         this.info('Available Git Commands:')
         this.info('`git branch`')
@@ -332,7 +334,7 @@ function(_yargs, d3, demos) {
         }
 
         console.log(JSON.stringify(demo));
-        return this.info('Exported JSON to terminal. Copying this to `demos.js`.');
+        return this.info('Exported JSON to terminal. Copy that JSON to `demos.js`.');
       }
 
       var split = entry.split(' ');
