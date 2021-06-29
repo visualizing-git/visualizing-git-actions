@@ -354,13 +354,7 @@ function(_yargs, d3, demos) {
         args = split.slice(2),
         argsStr = args.join(' ')
 
-      var options = yargs(argsStr, {
-        configuration: {
-          // Prevents commit hashes like `10e9999` from being parsed as scientific notation
-          // which gets rounded to "Infinity"
-          'parse-positional-numbers': false,
-        },
-      });
+      var options = yargs(argsStr);
 
       try {
         if (typeof this[method] === 'function') {
