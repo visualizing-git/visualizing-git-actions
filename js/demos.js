@@ -19,6 +19,7 @@ define([], function () {
   var mergeExample = {
     title: "Merge Example",
     key: "merge-example",
+    message: "Try merging `feature-1` or `feature-2` into `main`.",
     commitData: [
       {
         id: "abc1234",
@@ -167,9 +168,11 @@ define([], function () {
     ],
   };
 
-  var fetchAndPull = {
-    title: "Fetch + Pull",
-    key: "fetch-pull",
+  var fetchPullPush = {
+    title: "Fetch Pull Push",
+    key: "fetch-pull-push",
+    message:
+      "Fetch / pull data from the remote (origin) and push data to the remote.",
     commitData: [
       {
         id: "abc1234",
@@ -251,7 +254,7 @@ define([], function () {
         branchless: false,
       },
       {
-        id: "3d6b327",
+        id: "3a77c0d",
         tags: ["main", "HEAD"],
         message: "matt's change",
         parent: "1ee0de4",
@@ -280,7 +283,7 @@ define([], function () {
         branchless: false,
       },
       {
-        id: "e487ba3",
+        id: "b177c0d",
         tags: ["main", "HEAD"],
         message: "bill's change",
         parent: "1ee0de4",
@@ -294,7 +297,8 @@ define([], function () {
   var resetExample = {
     title: "Reset Example",
     key: "reset",
-    message: "Try performing hard resets on `main` to various commits",
+    message: "Try resetting `main` to various other commits",
+    currentBranch: "main",
     commitData: [
       {
         id: "abc1234",
@@ -370,21 +374,28 @@ define([], function () {
         parent2: "6666666",
         isNoFFCommit: true,
         id: "8888888",
-        tags: ["main", "HEAD"],
+        tags: [],
         message: "Merge",
         parent: "7777777",
         cx: 500,
         cy: 437,
         branchless: false,
       },
+      {
+        id: "9999999",
+        tags: ["main", "HEAD"],
+        parent: "8888888",
+        cx: 590,
+        cy: 437,
+        branchless: false,
+      },
     ],
-    currentBranch: "main",
   };
 
   var cherryPick = {
-    title: "Cherry Pick",
+    title: "Cherry-pick",
     key: "cherry-pick",
-    message: "Let's pick some commits",
+    message: "",
     commitData: [
       {
         id: "abc1234",
@@ -392,92 +403,62 @@ define([], function () {
         message: "first commit",
         parent: "initial",
         cx: 50,
-        cy: 318,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "790dd94",
-        tags: [],
+        id: "d78de96",
+        tags: ["main"],
         parent: "abc1234",
         cx: 140,
-        cy: 318,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "96e9ce7",
-        tags: ["[bugfix1]"],
-        parent: "790dd94",
+        id: "78d22fb",
+        tags: [],
+        parent: "d78de96",
         cx: 230,
-        cy: 318,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "44db644",
-        tags: [],
-        parent: "96e9ce7",
+        id: "239b2b1",
+        tags: ["my-feature", "HEAD"],
+        parent: "78d22fb",
         cx: 320,
-        cy: 318,
+        cy: 437,
         branchless: false,
       },
       {
-        id: "06127d7",
+        id: "73b3905",
         tags: [],
-        parent: "44db644",
-        cx: 410,
-        cy: 318,
-        branchless: false,
-      },
-      {
-        id: "60c6c2c",
-        tags: [],
-        parent: "790dd94",
+        message: "don't need 1",
+        parent: "d78de96",
         cx: 230,
-        cy: 228,
+        cy: 347,
         branchless: false,
       },
       {
-        id: "8f7c801",
-        tags: ["release", "HEAD"],
-        parent: "60c6c2c",
+        id: "da7a000",
+        tags: [],
+        message: "do need",
+        parent: "73b3905",
         cx: 320,
-        cy: 228,
+        cy: 347,
         branchless: false,
       },
       {
-        id: "78ecb32",
-        tags: [],
-        parent: "44db644",
+        id: "0025f2a",
+        tags: ["other-feature"],
+        message: "don't need 2",
+        parent: "da7a000",
         cx: 410,
-        cy: 228,
-        branchless: false,
-      },
-      {
-        id: "12e9bbb",
-        tags: ["bugfix2"],
-        parent: "78ecb32",
-        cx: 500,
-        cy: 228,
-        branchless: false,
-      },
-      {
-        id: "e8ce346",
-        tags: [],
-        parent: "06127d7",
-        cx: 500,
-        cy: 318,
-        branchless: false,
-      },
-      {
-        parent2: "12e9bbb",
-        id: "5749661",
-        tags: ["main"],
-        message: "Merge",
-        parent: "e8ce346",
-        cx: 590,
-        cy: 318,
+        cy: 347,
         branchless: false,
       },
     ],
+    currentBranch: "my-feature",
   };
 
   var rebaseExample = {
@@ -539,15 +520,75 @@ define([], function () {
     currentBranch: "feature",
   };
 
+  var revertExample = {
+    title: "Revert Example",
+    key: "revert",
+    message: "Oops, commit `badc0de` introduced a bug. Quickly revert it to undo those specific changes.",
+    commitData: [
+      {
+        id: "abc1234",
+        tags: [],
+        message: "first commit",
+        parent: "initial",
+        cx: 50,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "b239aea",
+        tags: [],
+        parent: "abc1234",
+        cx: 140,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "3306984",
+        tags: [],
+        parent: "b239aea",
+        cx: 230,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "badc0de",
+        tags: [],
+        message: "oops a bug",
+        parent: "3306984",
+        cx: 320,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "5492ffc",
+        tags: [],
+        parent: "badc0de",
+        cx: 410,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "cd3d263",
+        tags: ["main", "HEAD"],
+        parent: "5492ffc",
+        cx: 500,
+        cy: 437,
+        branchless: false,
+      },
+    ],
+    currentBranch: "main",
+  };
+
   return [
     free,
     freeWithRemote,
     mergeExample,
+    fetchPullPush,
     resetExample,
-    fetchAndPull,
     rebaseExample,
     pullRebase,
     rewrittenHistory,
     cherryPick,
+    revertExample,
   ];
 });
