@@ -137,6 +137,9 @@ require(['explaingit', 'demos'], function (explainGit, demos) {
       pres_toggle = pres_toggle === 'none' ? 'block' : 'none'
       document.getElementById('last-command').style.display = pres_toggle;
     }
+
+    // Initialize in presentation mode
+    window.pres();
 });
 </script>
 </body>
