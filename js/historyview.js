@@ -1299,7 +1299,11 @@ define(['d3'], function() {
         throw new Error('That branch doesn\'t exist.');
       }
 
-      this.branches.splice(branchIndex, 1);
+      while (branchIndex > 0) {
+        this.branches.splice(branchIndex, 1);
+        branchIndex = this.branches.indexOf(name);
+      }
+
       commit = this.getCommit(name);
       delete this.logs[name]
       branchIndex = commit.tags.indexOf(name);

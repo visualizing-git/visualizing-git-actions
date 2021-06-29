@@ -833,6 +833,7 @@ function(_yargs, d3, demos) {
       }
 
       if (remote.branches.indexOf(remoteRef) === -1) {
+        // This is hardcoded to all demos' initial commit
         remote.branch(remoteRef, 'abc1234')
       }
 
@@ -841,6 +842,10 @@ function(_yargs, d3, demos) {
 
         branchArgs[1] && (localRef = branchArgs[1]);
         branchArgs[2] === ':' && (remoteRef = branchArgs[3]);
+      }
+
+      if (String(localRef).toUpperCase() === 'HEAD') {
+        localRef = local.currentBranch;
       }
 
       if (local.branches.indexOf(localRef) === -1) {
