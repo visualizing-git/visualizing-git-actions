@@ -234,7 +234,7 @@ define([], function () {
     title: "Pull --rebase",
     key: "pull-rebase",
     message:
-      "You committed locally after an update was pushed to the remote. What happens if you try and pull?",
+      "You committed locally after an update was pushed to the remote. What happens if you try and push? What about a pull?",
     commitData: [
       {
         id: "abc1234",
@@ -523,7 +523,8 @@ define([], function () {
   var revertExample = {
     title: "Revert Example",
     key: "revert",
-    message: "Oops, commit `badc0de` introduced a bug. Quickly revert it to undo those specific changes.",
+    message:
+      "Oops, commit `badc0de` introduced a bug. Quickly revert it to undo those specific changes.",
     commitData: [
       {
         id: "abc1234",

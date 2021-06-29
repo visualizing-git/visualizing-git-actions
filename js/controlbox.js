@@ -229,7 +229,8 @@ function(_yargs, d3, demos) {
     },
 
     command: function(entry) {
-      entry = String(entry).trim().toLowerCase();
+      var original_entry = String(entry).trim();
+      entry = original_entry.toLowerCase();
       if (entry === '') {
         return;
       }
@@ -341,7 +342,7 @@ function(_yargs, d3, demos) {
 
       this.terminalOutput.append('div')
         .classed('command-entry', true)
-        .html(entry);
+        .html(original_entry);
 
       this._scrollToBottom();
 
