@@ -291,6 +291,96 @@ define([], function () {
     ],
   };
 
+  var resetExample = {
+    title: "Reset Example",
+    key: "reset",
+    message: "Try performing hard resets on `main` to various commits",
+    commitData: [
+      {
+        id: "abc1234",
+        tags: [],
+        message: "first commit",
+        parent: "initial",
+        cx: 50,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "1111111",
+        tags: [],
+        parent: "abc1234",
+        cx: 140,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "2222222",
+        tags: [],
+        parent: "1111111",
+        cx: 230,
+        cy: 347,
+        branchless: false,
+        isNoFFBranch: true,
+      },
+      {
+        id: "3333333",
+        tags: [],
+        parent: "2222222",
+        cx: 320,
+        cy: 347,
+        branchless: false,
+      },
+      {
+        id: "4444444",
+        tags: [],
+        parent: "abc1234",
+        cx: 140,
+        cy: 527,
+        branchless: false,
+        isNoFFBranch: true,
+      },
+      {
+        id: "5555555",
+        tags: [],
+        parent: "4444444",
+        cx: 230,
+        cy: 527,
+        branchless: false,
+      },
+      {
+        id: "6666666",
+        tags: [],
+        parent: "5555555",
+        cx: 320,
+        cy: 527,
+        branchless: false,
+      },
+      {
+        parent2: "3333333",
+        isNoFFCommit: true,
+        id: "7777777",
+        tags: [],
+        message: "Merge",
+        parent: "1111111",
+        cx: 410,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        parent2: "6666666",
+        isNoFFCommit: true,
+        id: "8888888",
+        tags: ["main", "HEAD"],
+        message: "Merge",
+        parent: "7777777",
+        cx: 500,
+        cy: 437,
+        branchless: false,
+      },
+    ],
+    currentBranch: "main",
+  };
+
   var cherryPick = {
     title: "Cherry Pick",
     key: "cherry-pick",
@@ -393,6 +483,7 @@ define([], function () {
   var rebaseExample = {
     title: "Rebase Example",
     key: "rebase-example",
+    message: "Try rebasing the `feature` branch onto `main`",
     commitData: [
       {
         id: "abc1234",
@@ -452,6 +543,7 @@ define([], function () {
     free,
     freeWithRemote,
     mergeExample,
+    resetExample,
     fetchAndPull,
     rebaseExample,
     pullRebase,
