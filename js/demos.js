@@ -81,54 +81,6 @@ define([], function () {
     currentBranch: "main",
   };
 
-  var upstreamChanges = {
-    title: "Upstream Changes",
-    key: "upstream-changes",
-    message: "Someone else has been working here!",
-    currentBranch: "feature",
-    commitData: [
-      {
-        id: "abc1234",
-        tags: [],
-        message: "first commit",
-        parent: "initial",
-      },
-      {
-        id: "84c98fe",
-        parent: "abc1234",
-        tags: ["main", "origin/main"],
-      },
-      {
-        id: "1c016b6",
-        parent: "abc1234",
-        tags: ["feature", "origin/feature", "HEAD"],
-      },
-    ],
-    originData: [
-      {
-        id: "abc1234",
-        tags: [],
-        message: "first commit",
-        parent: "initial",
-      },
-      {
-        id: "84c98fe",
-        parent: "abc1234",
-        tags: ["main", "HEAD"],
-      },
-      {
-        id: "1c016b6",
-        parent: "abc1234",
-        tags: [],
-      },
-      {
-        id: "fd0af32",
-        tags: ["feature"],
-        parent: "1c016b6",
-      },
-    ],
-  };
-
   var rewrittenHistory = {
     title: "Rewritten Remote History",
     key: "rewritten-history",
@@ -441,7 +393,6 @@ define([], function () {
     free,
     freeWithRemote,
     mergeExample,
-    upstreamChanges,
     rewrittenHistory,
     fetchAndPull,
     pullRebase,

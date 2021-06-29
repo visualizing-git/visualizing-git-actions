@@ -83,13 +83,19 @@ require(['explaingit', 'demos'], function (explainGit, demos) {
       return JSON.parse(JSON.stringify(demo))
     }
 
-    var lastDemo = findDemo(demos, cleanHash(window.location.hash)) || demos[0]
+    function updateTitle(str) {
+      document.title = str ? (str + ' | Visualizing Git') : 'Visualizing Git';
+    }
+
+    var lastDemo = findDemo(demos, cleanHash(window.location.hash)) || demos[0];
+    updateTitle(lastDemo.title);
 
     ready(function () {
       window.onhashchange = function () {
         var demo = findDemo(demos, cleanHash(window.location.hash)) || lastDemo
         if (demo) {
-          lastDemo = demo
+          lastDemo = demo;
+          updateTitle(lastDemo.title);
           document.getElementById('last-command').textContent = ""
           clean()
           open()
