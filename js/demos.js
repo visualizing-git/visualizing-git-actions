@@ -230,7 +230,8 @@ define([], function () {
   var pullRebase = {
     title: "Pull --rebase",
     key: "pull-rebase",
-    message: "You committed locally after an update was pushed to the remote. What happens if you try and pull?",
+    message:
+      "You committed locally after an update was pushed to the remote. What happens if you try and pull?",
     commitData: [
       {
         id: "abc1234",
@@ -389,13 +390,72 @@ define([], function () {
     ],
   };
 
+  var rebaseExample = {
+    title: "Rebase Example",
+    key: "rebase-example",
+    commitData: [
+      {
+        id: "abc1234",
+        tags: [],
+        message: "first commit",
+        parent: "initial",
+        cx: 50,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "4c7f2da",
+        tags: [],
+        parent: "abc1234",
+        cx: 140,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "1fbf33c",
+        tags: ["main"],
+        message: "important hotfix",
+        parent: "4c7f2da",
+        cx: 230,
+        cy: 437,
+        branchless: false,
+      },
+      {
+        id: "44631d2",
+        tags: [],
+        parent: "4c7f2da",
+        cx: 230,
+        cy: 347,
+        branchless: false,
+      },
+      {
+        id: "9431439",
+        tags: [],
+        parent: "44631d2",
+        cx: 320,
+        cy: 347,
+        branchless: false,
+      },
+      {
+        id: "683a437",
+        tags: ["feature", "HEAD"],
+        parent: "9431439",
+        cx: 410,
+        cy: 347,
+        branchless: false,
+      },
+    ],
+    currentBranch: "feature",
+  };
+
   return [
     free,
     freeWithRemote,
     mergeExample,
-    rewrittenHistory,
     fetchAndPull,
+    rebaseExample,
     pullRebase,
+    rewrittenHistory,
     cherryPick,
   ];
 });
