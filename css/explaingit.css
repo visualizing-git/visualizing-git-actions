@@ -203,7 +203,8 @@ circle.commit {
   stroke: #888888;
   stroke-width: 3;
   transition-property: stroke, fill;
-  transition-duration: 500ms;
+  /* Keep this in sync with `TRANSITION_DURATION_MS` in 'js/historyview.js' */
+  transition-duration: 1000ms;
   transition-timing-function: ease-out;
 }
 
