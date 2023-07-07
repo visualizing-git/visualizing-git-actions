@@ -1,6 +1,9 @@
 define(['d3'], function() {
   "use strict";
 
+  // Keep this in sync with `circle.commit { transition-duration }` CSS property in 'css/explaingit.css'
+  var TRANSITION_DURATION_MS = 1000;
+
   /**
    * @param {Function} fn 
    * @returns {Function}
@@ -660,7 +663,7 @@ define(['d3'], function() {
         });
 
       existingCircles.transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .call(fixCirclePosition);
 
       newCircles = existingCircles.enter()
@@ -681,7 +684,7 @@ define(['d3'], function() {
         .call(fixCirclePosition)
         .attr('r', 1)
         .transition("inflate")
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .attr('r', this.commitRadius)
 
       existingCircles.exit()
@@ -703,7 +706,7 @@ define(['d3'], function() {
         });
 
       existingPointers.transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .call(fixPointerStartPosition, view)
         .call(fixPointerEndPosition, view);
 
@@ -726,7 +729,7 @@ define(['d3'], function() {
         })
         .attr('marker-end', REG_MARKER_END)
         .transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .call(fixPointerEndPosition, view);
 
       existingPointers.exit()
@@ -753,7 +756,8 @@ define(['d3'], function() {
           return view.name + '-' + d.id + '-to-' + d.parent2;
         });
 
-      existingPointers.transition().duration(500)
+      existingPointers.transition()
+        .duration(TRANSITION_DURATION_MS)
         .attr('points', function(d) {
           var p1 = px1(d, view, 'parent2') + ',' + py1(d, view, 'parent2'),
             p2 = px2(d, view, 'parent2') + ',' + py2(d, view, 'parent2');
@@ -776,7 +780,7 @@ define(['d3'], function() {
         })
         .attr('marker-end', MERGE_MARKER_END)
         .transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .attr('points', function(d) {
           var points = d3.select(this).attr('points').split(' '),
             x2 = px2(d, view, 'parent2'),
@@ -941,7 +945,7 @@ define(['d3'], function() {
 
       existingTags.select('rect')
         .transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .attr('y', function(d) {
           return tagY(d, view);
         })
@@ -954,7 +958,7 @@ define(['d3'], function() {
 
       existingTags.select('text')
         .transition()
-        .duration(500)
+        .duration(TRANSITION_DURATION_MS)
         .attr('y', function(d) {
           return tagY(d, view) + 14;
         })
