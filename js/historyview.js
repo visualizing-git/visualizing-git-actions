@@ -302,8 +302,17 @@ define(['d3'], function() {
     }
   }
 
-  HistoryView.generateId = function() {
-    return Math.floor((1 + Math.random()) * 0x10000000).toString(16).substring(1);
+  // Ensure generated commit hashes are unique
+  HistoryView._usedIds = new Set();
+
+  HistoryView.generateId = function () {
+    let id;
+    do {
+      // 7 char hex string
+      id = Math.floor((1 + Math.random()) * 0x10000000).toString(16).substring(1);
+    } while (HistoryView._usedIds.has(id));
+    HistoryView._usedIds.add(id);
+    return id;
   };
 
   HistoryView.prototype = {
