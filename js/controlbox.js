@@ -644,8 +644,8 @@ function(_yargs, d3, demos) {
       var noFF = false;
       var squash = false;
 
-      // Assume first arg is the flag, second is the branch
-      var [flag, branch] = args;
+      // Assume first arg is the branch, second is the flag to support calling 'git merge' with only 1 arg
+      var [branch, flag] = args;
       var result;
 
       var validFlags = ['--no-ff', '--ff', '--squash'];
@@ -657,7 +657,7 @@ function(_yargs, d3, demos) {
 
       if (args.length === 2) {
         if (!flag.startsWith('--')) {
-          // Swap the args, first arg is actually the branch
+          // Swap the args, first arg is actually the flag
           [flag, branch] = [branch, flag];
         }
   
