@@ -1577,7 +1577,7 @@ define(['d3'], function() {
       return base_commit;
     },
 
-    merge: function(ref, noFF) {
+    merge: function(ref, noFF, squash) {
       var mergeSource = this.getCommit(ref),
         mergeTarget = this.getCommit('HEAD');
       
@@ -1612,10 +1612,13 @@ define(['d3'], function() {
           parent2: mergeSource.id,
           isNoFFCommit: true
         }, 'Merge');
+      } else if (squash === true) {
+        
       } else if (this.isAncestorOf(mergeTarget.id, mergeSource.id)) {
         this.fastForward(mergeSource);
         return 'Fast-Forward';
       } else {
+        // No flags, and commit is not fast-forwardable, so create a merge commit
         this.commit({
           parent2: mergeSource.id
         }, 'Merge');
