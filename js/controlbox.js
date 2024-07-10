@@ -641,26 +641,38 @@ function(_yargs, d3, demos) {
 
     merge: function(args) {
       var noFF = false;
-      var branch = args[0];
-      var result
+      var squash = false;
+
+      // Assume first arg is the flag, second is the branch
+      var [flag, branch] = args;
+      var result;
+
+      var validFlags = ['--no-ff', '--ff', '--squash'];
+      var validFlagsStr = validFlags.join(', ');
+
+      if (args.length > 2) {
+        throw new Error(`Too many arguments. This demo only supports the following singular flags: ${validFlagsStr}`);
+      }
+
       if (args.length === 2) {
-        if (args[0] === '--no-ff' || args[0] === '--ff') {
-          if (args[0] === '--no-ff') {
+        if (!flag.startsWith('--')) {
+          // Swap the args, first arg is actually the branch
+          [flag, branch] = [branch, flag];
+        }
+  
+        if (validFlags.includes(flag)) {
+          if (flag === '--no-ff') {
             noFF = true;
+          } else if (flag === '--squash') {
+            squash = true;
           }
-          branch = args[1];
-        } else if (args[1] === '--no-ff' || args[1] === '--ff') {
-          if (args[1] === '--no-ff') {
-            noFF = true;
-          }
-          branch = args[0];
         } else {
-          this.info('This demo only supports the --no-ff and --ff switches..');
+          this.info(`This demo only supports the following flags: ${validFlagsStr}`);
         }
       }
 
       this.transact(function() {
-        result = this.getRepoView().merge(branch, noFF);
+        result = this.getRepoView().merge(branch, noFF, squash);
 
         if (result === 'Fast-Forward') {
           this.info('You have performed a fast-forward merge.');
