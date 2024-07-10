@@ -385,7 +385,7 @@ define(['d3'], function() {
 
     /**
      * @method getCommit
-     * @param ref {String} the id or a tag name that refers to the commit
+     * @param ref {String, Object} the id or a tag name that refers to the commit. Commit objects are returned.
      * @return {Object} the commit datum object
      */
     getCommit: function getCommit(ref) {
@@ -1702,10 +1702,10 @@ define(['d3'], function() {
         this.flashProperty(commitsToCopy, 'rebased', function() {
           commitsToCopy.forEach(function(ref) {
             var oldCommit = this.getCommit(ref)
-            this.commit({rebased: true, rebaseSource: ref}, oldCommit.message)
-              this.addReflogEntry(
-                'HEAD', this.getCommit('HEAD').id, 'rebase: ' + (oldCommit.message || oldCommit.id)
-              )
+            this.commit({rebased: true, rebaseSource: ref}, oldCommit.message);
+            this.addReflogEntry(
+              'HEAD', this.getCommit('HEAD').id, 'rebase: ' + (oldCommit.message || oldCommit.id)
+            );
           }, this)
           var newHeadCommit = this.getCommit('HEAD')
           this.lock()
