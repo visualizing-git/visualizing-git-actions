@@ -676,11 +676,15 @@ function(_yargs, d3, demos) {
 
         if (result === 'Fast-Forward') {
           this.info('You have performed a fast-forward merge.');
+        } else if (result === 'Squash') {
+          this.info('You have performed a squash merge.');
         }
       }, function(before, after) {
         var reflogMsg = "merge " + branch + ": "
         if (result === 'Fast-Forward') {
           reflogMsg += "Fast-forward"
+        } else if (result === 'Squash') {
+          reflogMsg += "Squash"
         } else {
           reflogMsg += "Merge made by the 'recursive' strategy."
         }

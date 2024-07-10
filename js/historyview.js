@@ -658,6 +658,9 @@ define(['d3'], function() {
         .classed('cherry-picked', function(d) {
           return d.cherryPicked || d.cherryPickSource;
         })
+        .classed('squash-merge', function(d) {
+          return Boolean(d.squashOf);
+        })
         .classed('checked-out', function(d) {
           return d.tags.indexOf('HEAD') > -1
         });
@@ -680,6 +683,9 @@ define(['d3'], function() {
         })
         .classed('cherry-picked', function(d) {
           return d.cherryPicked || d.cherryPickSource;
+        })
+        .classed('squash-merge', function(d) {
+          return Boolean(d.squashOf);
         })
         .call(fixCirclePosition)
         .attr('r', 1)
@@ -1632,7 +1638,21 @@ define(['d3'], function() {
           isNoFFCommit: true
         }, 'Merge');
       } else if (squash === true) {
-        
+        let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
+        // Get commits from source to the base
+        let commits_from_source_to_base = this.walkAncestors(mergeSource, (commit) => {
+          if (commit === merge_base_commit) {
+            return false;
+          }
+        });
+
+        // Create commit message of squash commit hashes (only 4 chars of hash to reduce text size since it doesn't wrap)
+        let commitIdsStr = [...commits_from_source_to_base]
+          .map((c) => String(c.id).slice(0, 4))
+          .join(', ');
+        this.commit({squashOf: [mergeSource, mergeTarget]}, `Squash of: ${commitIdsStr}`);
+
+        return 'Squash';
       } else if (this.isAncestorOf(mergeTarget.id, mergeSource.id)) {
         this.fastForward(mergeSource);
         return 'Fast-Forward';

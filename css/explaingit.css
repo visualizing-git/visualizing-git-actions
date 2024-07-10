@@ -235,6 +235,15 @@ circle.commit.cherry-picked.checked-out {
   fill: #ff5151;
 }
 
+circle.commit.squash-merge {
+  stroke: #2A7A60;
+  fill: #C0FDFB;
+}
+
+circle.commit.squash-merge.checked-out {
+  fill: #C0FDFB;
+}
+
 circle.commit.branchless {
   fill: #FEFEFE;
   stroke: #888888;
