@@ -160,6 +160,7 @@ function(_yargs, d3, demos) {
         var e = d3.event;
 
         switch (e.keyCode) {
+          // Enter
           case 13:
             if (this.value.trim() === '' || cBox.locked) {
               return;
@@ -172,6 +173,7 @@ function(_yargs, d3, demos) {
             this.value = '';
             e.stopImmediatePropagation();
             break;
+          // ArrowUp
           case 38:
             var previousCommand = cBox._commandHistory[cBox._currentCommand + 1];
             if (cBox._currentCommand === -1) {
@@ -185,6 +187,7 @@ function(_yargs, d3, demos) {
             }
             e.stopImmediatePropagation();
             break;
+          // ArrowDown
           case 40:
             var nextCommand = cBox._commandHistory[cBox._currentCommand - 1];
             if (typeof nextCommand === 'string') {
