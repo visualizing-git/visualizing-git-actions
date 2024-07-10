@@ -1517,24 +1517,33 @@ define(['d3'], function() {
 
       let ff_parent;
 
+      function cleanColors(...commitCollections) {
+        for (let collection of commitCollections) {
+          for (let commit of collection) {
+            delete commit.color;
+          }
+        }
+      }
+
+      // Mark all parent commits of `a` as "blue"
       let a_to_root = this.walkAncestors(commit_a, (commit) => {
+        // If along our walk from 'a' , we come across 'b', then 'b' is the merge base (it is fast-forwardable)
         if (commit === commit_b) {
           ff_parent = commit_b;
         }
         commit.color = "blue";
       });
+
       if (ff_parent) {
-        // Clean up colors
-        let all_commits = [...a_to_root];
-        for (let commit of all_commits) {
-          delete commit.color;
-        }
+        cleanColors(a_to_root);
         return ff_parent;
       }
   
+      // Mark all "blue" parent commits of `b` as "red" (red == parent of both 'a' and 'b')
       let b_to_root = this.walkAncestors(
         commit_b,
         (commit) => {
+          // Similar, if along our walk from 'b' we come across 'a', then 'a' is the merge base (it is fast-forwardable)
           if (commit === commit_a) {
             ff_parent = commit_a;
           }
@@ -1545,14 +1554,17 @@ define(['d3'], function() {
       );
 
       if (ff_parent) {
-        // Clean up colors
-        let all_commits = [...new Set([...a_to_root, ...b_to_root])];
-        for (let commit of all_commits) {
-          delete commit.color;
-        }
+        cleanColors(a_to_root, b_to_root);
         return ff_parent;
       }
 
+      /**
+       * If we are here, we aren't fast-forwardable.
+       * So walk from 'b', and mark all "red" parent commits as "black".
+       * The only 'red' commits leftover then are the merge base.
+       * It is possible to have more than one 'red' commit afterward. Later,
+       * when we re-walk to find that red commit, we bail on the first one we find.
+       */
       this.walkAncestors(
         commit_b,
         (commit) => {
@@ -1572,11 +1584,7 @@ define(['d3'], function() {
         }
       });
 
-      // Clean up colors
-      let all_commits = [...new Set([...a_to_root, ...b_to_root])];
-      for (let commit of all_commits) {
-        delete commit.color;
-      }
+      cleanColors(a_to_root, b_to_root);
 
       return base_commit;
     },
@@ -1598,6 +1606,13 @@ define(['d3'], function() {
       } else if (noFF === true) {
         let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
         let merge_base_child_commit;
+
+        /**
+         * Annoying, but `walkAncestors` runs the callback from the first parent, not
+         * the commit you pass in, so I need to manually check if our source's first
+         * parent is the merge base. Otherwise, this `if/else` is doing the same thing:
+         * getting the child of the merge base.
+         */
         if (mergeSource.parent === merge_base_commit.id || mergeSource.parent2 === merge_base_commit.id) {
           merge_base_child_commit = mergeSource;
         } else {
