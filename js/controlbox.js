@@ -257,6 +257,7 @@ function(_yargs, d3, demos) {
         this.info('`git fetch`')
         this.info('`git log`')
         this.info('`git merge`')
+        this.info('`git merge-base`')
         this.info('`git pull`')
         this.info('`git push`')
         this.info('`git rebase`')
@@ -697,6 +698,12 @@ function(_yargs, d3, demos) {
           )
         }
       })
+    },
+
+    merge_base: function(args) {
+      let [ref_a, ref_b] = args;
+      let merge_base = this.getRepoView().mergeBase(ref_a, ref_b);
+      this.info(merge_base ? merge_base.id : 'No common ancestor');
     },
 
     rebase: function(args) {
