@@ -276,8 +276,9 @@ circle.commit.logging {
 }
 
 .commit-pointer.branchless, .merge-pointer.branchless {
-  stroke: #DDD;
-  stroke-width: 2;
+  stroke: #BBB;
+  stroke-width: 4;
+  stroke-dasharray: 4;
 }
 
 text.id-label {
