@@ -661,6 +661,9 @@ define(['d3'], function() {
         .classed('rebased', function(d) {
           return d.rebased || d.rebaseSource;
         })
+        .classed('squash-to-copy', function(d) {
+          return d['squash-to-copy'];
+        })
         .classed('logging', function(d) {
           return d.logging;
         })
@@ -689,6 +692,9 @@ define(['d3'], function() {
         })
         .classed('rebased', function(d) {
           return d.rebased || d.rebaseSource
+        })
+        .classed('squash-to-copy', function(d) {
+          return d['squash-to-copy'];
         })
         .classed('cherry-picked', function(d) {
           return d.cherryPicked || d.cherryPickSource;
@@ -1649,17 +1655,23 @@ define(['d3'], function() {
       } else if (squash === true) {
         let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
         // Get commits from source to the base
-        let commits_from_source_to_base = this.walkAncestors(mergeSource, (commit) => {
-          if (commit === merge_base_commit) {
-            return false;
-          }
-        });
+        let commits_from_source_to_base = Array.from(
+          this.walkAncestors(mergeSource, (commit) => {
+            if (commit === merge_base_commit) {
+              return false;
+            }
+          })
+        );
 
-        // Create commit message of squash commit hashes (only 4 chars of hash to reduce text size since it doesn't wrap)
-        let commitIdsStr = [...commits_from_source_to_base]
-          .map((c) => String(c.id).slice(0, 4))
-          .join(', ');
-        this.commit({squashOf: [mergeSource, mergeTarget]}, `Squash of: ${commitIdsStr}`);
+        this.lock();
+        this.flashProperty(commits_from_source_to_base, 'squash-to-copy', () => {
+          // Create commit message of squash commit hashes (use only 4 chars of hash to reduce text size since it doesn't wrap)
+          let commitIdsStr = commits_from_source_to_base
+            .map((c) => String(c.id).slice(0, 4))
+            .join(', ');
+          this.commit({squashOf: [mergeSource, mergeTarget]}, `Squash of: ${commitIdsStr}`);
+          this.unlock();
+        });
 
         return 'Squash';
       } else if (this.isAncestorOf(mergeTarget.id, mergeSource.id)) {

@@ -199,8 +199,8 @@ span.cmd {
 }
 
 circle.commit {
-  fill: #CCCCCC;
-  stroke: #888888;
+  fill: hsl(0, 0%, 80%);
+  stroke: hsl(0, 0%, 53%);
   stroke-width: 3;
   transition-property: stroke, fill;
   /* Keep this in sync with `TRANSITION_DURATION_MS` in 'js/historyview.js' */
@@ -236,8 +236,14 @@ circle.commit.cherry-picked.checked-out {
 }
 
 circle.commit.squash-merge {
-  stroke: #2A7A60;
-  fill: #C0FDFB;
+  stroke: hsl(161, 49%, 32%);
+  fill: hsl(178, 94%, 87%);
+}
+
+circle.commit.squash-to-copy {
+  stroke-width: 4;
+  stroke: hsl(161, 100%, 53%);
+  fill: hsl(178, 100%, 80%);
 }
 
 circle.commit.squash-merge.checked-out {
