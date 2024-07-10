@@ -302,8 +302,17 @@ define(['d3'], function() {
     }
   }
 
-  HistoryView.generateId = function() {
-    return Math.floor((1 + Math.random()) * 0x10000000).toString(16).substring(1);
+  // Ensure generated commit hashes are unique
+  HistoryView._usedIds = new Set();
+
+  HistoryView.generateId = function () {
+    let id;
+    do {
+      // 7 char hex string
+      id = Math.floor((1 + Math.random()) * 0x10000000).toString(16).substring(1);
+    } while (HistoryView._usedIds.has(id));
+    HistoryView._usedIds.add(id);
+    return id;
   };
 
   HistoryView.prototype = {
@@ -376,7 +385,7 @@ define(['d3'], function() {
 
     /**
      * @method getCommit
-     * @param ref {String} the id or a tag name that refers to the commit
+     * @param ref {String, Object} the id or a tag name that refers to the commit. Commit objects are returned.
      * @return {Object} the commit datum object
      */
     getCommit: function getCommit(ref) {
@@ -652,11 +661,17 @@ define(['d3'], function() {
         .classed('rebased', function(d) {
           return d.rebased || d.rebaseSource;
         })
+        .classed('squash-to-copy', function(d) {
+          return d['squash-to-copy'];
+        })
         .classed('logging', function(d) {
           return d.logging;
         })
         .classed('cherry-picked', function(d) {
           return d.cherryPicked || d.cherryPickSource;
+        })
+        .classed('squash-merge', function(d) {
+          return Boolean(d.squashOf);
         })
         .classed('checked-out', function(d) {
           return d.tags.indexOf('HEAD') > -1
@@ -678,8 +693,14 @@ define(['d3'], function() {
         .classed('rebased', function(d) {
           return d.rebased || d.rebaseSource
         })
+        .classed('squash-to-copy', function(d) {
+          return d['squash-to-copy'];
+        })
         .classed('cherry-picked', function(d) {
           return d.cherryPicked || d.cherryPickSource;
+        })
+        .classed('squash-merge', function(d) {
+          return Boolean(d.squashOf);
         })
         .call(fixCirclePosition)
         .attr('r', 1)
@@ -1511,26 +1532,39 @@ define(['d3'], function() {
       let commit_a = typeof ref_a === 'string' ? this.getCommit(ref_a) : ref_a;
       let commit_b = typeof ref_b === 'string' ? this.getCommit(ref_b) : ref_b;
 
+      if (commit_a === commit_b) {
+        return commit_a;
+      }
+
       let ff_parent;
 
+      function cleanColors(...commitCollections) {
+        for (let collection of commitCollections) {
+          for (let commit of collection) {
+            delete commit.color;
+          }
+        }
+      }
+
+      // Mark all parent commits of `a` as "blue"
       let a_to_root = this.walkAncestors(commit_a, (commit) => {
+        // If along our walk from 'a' , we come across 'b', then 'b' is the merge base (it is fast-forwardable)
         if (commit === commit_b) {
           ff_parent = commit_b;
         }
         commit.color = "blue";
       });
+
       if (ff_parent) {
-        // Clean up colors
-        let all_commits = [...a_to_root];
-        for (let commit of all_commits) {
-          delete commit.color;
-        }
+        cleanColors(a_to_root);
         return ff_parent;
       }
   
+      // Mark all "blue" parent commits of `b` as "red" (red == parent of both 'a' and 'b')
       let b_to_root = this.walkAncestors(
         commit_b,
         (commit) => {
+          // Similar, if along our walk from 'b' we come across 'a', then 'a' is the merge base (it is fast-forwardable)
           if (commit === commit_a) {
             ff_parent = commit_a;
           }
@@ -1541,14 +1575,17 @@ define(['d3'], function() {
       );
 
       if (ff_parent) {
-        // Clean up colors
-        let all_commits = [...new Set([...a_to_root, ...b_to_root])];
-        for (let commit of all_commits) {
-          delete commit.color;
-        }
+        cleanColors(a_to_root, b_to_root);
         return ff_parent;
       }
 
+      /**
+       * If we are here, we aren't fast-forwardable.
+       * So walk from 'b', and mark all "red" parent commits as "black".
+       * The only 'red' commits leftover then are the merge base.
+       * It is possible to have more than one 'red' commit afterward. Later,
+       * when we re-walk to find that red commit, we bail on the first one we find.
+       */
       this.walkAncestors(
         commit_b,
         (commit) => {
@@ -1568,16 +1605,12 @@ define(['d3'], function() {
         }
       });
 
-      // Clean up colors
-      let all_commits = [...new Set([...a_to_root, ...b_to_root])];
-      for (let commit of all_commits) {
-        delete commit.color;
-      }
+      cleanColors(a_to_root, b_to_root);
 
       return base_commit;
     },
 
-    merge: function(ref, noFF) {
+    merge: function(ref, noFF, squash) {
       var mergeSource = this.getCommit(ref),
         mergeTarget = this.getCommit('HEAD');
       
@@ -1594,6 +1627,13 @@ define(['d3'], function() {
       } else if (noFF === true) {
         let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
         let merge_base_child_commit;
+
+        /**
+         * Annoying, but `walkAncestors` runs the callback from the first parent, not
+         * the commit you pass in, so I need to manually check if our source's first
+         * parent is the merge base. Otherwise, this `if/else` is doing the same thing:
+         * getting the child of the merge base.
+         */
         if (mergeSource.parent === merge_base_commit.id || mergeSource.parent2 === merge_base_commit.id) {
           merge_base_child_commit = mergeSource;
         } else {
@@ -1612,10 +1652,33 @@ define(['d3'], function() {
           parent2: mergeSource.id,
           isNoFFCommit: true
         }, 'Merge');
+      } else if (squash === true) {
+        let merge_base_commit = this.mergeBase(mergeSource, mergeTarget);
+        // Get commits from source to the base
+        let commits_from_source_to_base = Array.from(
+          this.walkAncestors(mergeSource, (commit) => {
+            if (commit === merge_base_commit) {
+              return false;
+            }
+          })
+        );
+
+        this.lock();
+        this.flashProperty(commits_from_source_to_base, 'squash-to-copy', () => {
+          // Create commit message of squash commit hashes (use only 4 chars of hash to reduce text size since it doesn't wrap)
+          let commitIdsStr = commits_from_source_to_base
+            .map((c) => String(c.id).slice(0, 4))
+            .join(', ');
+          this.commit({squashOf: [mergeSource, mergeTarget]}, `Squash of: ${commitIdsStr}`);
+          this.unlock();
+        });
+
+        return 'Squash';
       } else if (this.isAncestorOf(mergeTarget.id, mergeSource.id)) {
         this.fastForward(mergeSource);
         return 'Fast-Forward';
       } else {
+        // No flags, and commit is not fast-forwardable, so create a merge commit
         this.commit({
           parent2: mergeSource.id
         }, 'Merge');
@@ -1651,10 +1714,10 @@ define(['d3'], function() {
         this.flashProperty(commitsToCopy, 'rebased', function() {
           commitsToCopy.forEach(function(ref) {
             var oldCommit = this.getCommit(ref)
-            this.commit({rebased: true, rebaseSource: ref}, oldCommit.message)
-              this.addReflogEntry(
-                'HEAD', this.getCommit('HEAD').id, 'rebase: ' + (oldCommit.message || oldCommit.id)
-              )
+            this.commit({rebased: true, rebaseSource: ref}, oldCommit.message);
+            this.addReflogEntry(
+              'HEAD', this.getCommit('HEAD').id, 'rebase: ' + (oldCommit.message || oldCommit.id)
+            );
           }, this)
           var newHeadCommit = this.getCommit('HEAD')
           this.lock()

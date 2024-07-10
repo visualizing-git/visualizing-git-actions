@@ -12,6 +12,7 @@ git commit
 git fetch
 git log
 git merge
+git merge-base
 git pull
 git push
 git rebase

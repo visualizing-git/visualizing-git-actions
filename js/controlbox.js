@@ -160,6 +160,7 @@ function(_yargs, d3, demos) {
         var e = d3.event;
 
         switch (e.keyCode) {
+          // Enter
           case 13:
             if (this.value.trim() === '' || cBox.locked) {
               return;
@@ -172,6 +173,7 @@ function(_yargs, d3, demos) {
             this.value = '';
             e.stopImmediatePropagation();
             break;
+          // ArrowUp
           case 38:
             var previousCommand = cBox._commandHistory[cBox._currentCommand + 1];
             if (cBox._currentCommand === -1) {
@@ -185,6 +187,7 @@ function(_yargs, d3, demos) {
             }
             e.stopImmediatePropagation();
             break;
+          // ArrowDown
           case 40:
             var nextCommand = cBox._commandHistory[cBox._currentCommand - 1];
             if (typeof nextCommand === 'string') {
@@ -254,6 +257,7 @@ function(_yargs, d3, demos) {
         this.info('`git fetch`')
         this.info('`git log`')
         this.info('`git merge`')
+        this.info('`git merge-base`')
         this.info('`git pull`')
         this.info('`git push`')
         this.info('`git rebase`')
@@ -638,34 +642,50 @@ function(_yargs, d3, demos) {
 
     merge: function(args) {
       var noFF = false;
-      var branch = args[0];
-      var result
+      var squash = false;
+
+      // Assume first arg is the flag, second is the branch
+      var [flag, branch] = args;
+      var result;
+
+      var validFlags = ['--no-ff', '--ff', '--squash'];
+      var validFlagsStr = validFlags.join(', ');
+
+      if (args.length > 2) {
+        throw new Error(`Too many arguments. This demo only supports the following singular flags: ${validFlagsStr}`);
+      }
+
       if (args.length === 2) {
-        if (args[0] === '--no-ff' || args[0] === '--ff') {
-          if (args[0] === '--no-ff') {
+        if (!flag.startsWith('--')) {
+          // Swap the args, first arg is actually the branch
+          [flag, branch] = [branch, flag];
+        }
+  
+        if (validFlags.includes(flag)) {
+          if (flag === '--no-ff') {
             noFF = true;
+          } else if (flag === '--squash') {
+            squash = true;
           }
-          branch = args[1];
-        } else if (args[1] === '--no-ff' || args[1] === '--ff') {
-          if (args[1] === '--no-ff') {
-            noFF = true;
-          }
-          branch = args[0];
         } else {
-          this.info('This demo only supports the --no-ff and --ff switches..');
+          this.info(`This demo only supports the following flags: ${validFlagsStr}`);
         }
       }
 
       this.transact(function() {
-        result = this.getRepoView().merge(branch, noFF);
+        result = this.getRepoView().merge(branch, noFF, squash);
 
         if (result === 'Fast-Forward') {
           this.info('You have performed a fast-forward merge.');
+        } else if (result === 'Squash') {
+          this.info('You have performed a squash merge.');
         }
       }, function(before, after) {
         var reflogMsg = "merge " + branch + ": "
         if (result === 'Fast-Forward') {
           reflogMsg += "Fast-forward"
+        } else if (result === 'Squash') {
+          reflogMsg += "Squash"
         } else {
           reflogMsg += "Merge made by the 'recursive' strategy."
         }
@@ -678,6 +698,12 @@ function(_yargs, d3, demos) {
           )
         }
       })
+    },
+
+    merge_base: function(args) {
+      let [ref_a, ref_b] = args;
+      let merge_base = this.getRepoView().mergeBase(ref_a, ref_b);
+      this.info(merge_base ? merge_base.id : 'No common ancestor');
     },
 
     rebase: function(args) {
