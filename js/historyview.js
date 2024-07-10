@@ -1511,6 +1511,10 @@ define(['d3'], function() {
       let commit_a = typeof ref_a === 'string' ? this.getCommit(ref_a) : ref_a;
       let commit_b = typeof ref_b === 'string' ? this.getCommit(ref_b) : ref_b;
 
+      if (commit_a === commit_b) {
+        return commit_a;
+      }
+
       let ff_parent;
 
       let a_to_root = this.walkAncestors(commit_a, (commit) => {
